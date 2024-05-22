@@ -1,9 +1,8 @@
 /*************************************************************************************************************************************/
 /*                                                                                                                                   */
-/*                                   Here is the main file containing the extension entry and exit                                   */
+/*                                    Here is about creating webviews and communication                                              */
 /*                                                                                                                                   */
 /*************************************************************************************************************************************/
-
 
 
 
@@ -12,25 +11,27 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FileSystem as filesystem } from './filesystem';
-import {SidebarProvider} from './webview_communication';
 
 
-/**********************************************************Extension entry************************************************************/
+/***********************************************performance manager sidebar webview***************************************************/
 
-export function activate(context: vscode.ExtensionContext) {
+export class SidebarProvider implements vscode.WebviewViewProvider {
+	constructor(protected context: vscode.ExtensionContext) {}
+  
+	public resolveWebviewView(webviewView: vscode.WebviewView) {
+	  webviewView.webview.options = {
+		enableScripts: true,
+		localResourceRoots: [this.context.extensionUri],
+	  };
+  
+	  webviewView.webview.html = filesystem.getWebViewContent(this.context,"./src/webview/sidebar.html");
 
-    filesystem.initialize();
-    if(filesystem.gamecontent_json_exit){
-        console.log('exit');
-    }
+	  webviewView.webview.onDidReceiveMessage(message=>{
+		if(message.type==='buttonClick'){//按下按钮
+			
+		}
+	  });
 
-	context.subscriptions.push(vscode.window.registerWebviewViewProvider('designer-manager',new SidebarProvider(context)));//创建sidebarwebview
+	}
 
-}
-
-
-/**********************************************************Extension exit*************************************************************/
-
-export function deactivate() {
-
-}
+  }
