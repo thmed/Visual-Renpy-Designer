@@ -11,12 +11,30 @@
   "categories": [
     "Other"
   ],
+  "icon": "./src/img/icon.png",
   "activationEvents": [
-    "*"
+
   ],
   "main": "./dist/extension.js",
   "contributes": {
-
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "designer-sidebar",
+          "title": "Ren'py演出设计器",
+          "icon": "./src/img/code.svg"
+        }
+      ]
+    },
+    "views": {
+      "designer-sidebar":[
+        {
+          "type": "webview",
+          "id": "designer-manager",
+          "name": "演出管理器"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
