@@ -26,10 +26,28 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   
 	  webviewView.webview.html = filesystem.getWebViewContent(this.context,"./src/webview/sidebar.html");
 
-	  webviewView.webview.onDidReceiveMessage(message=>{
-		if(message.type==='buttonClick'){//按下按钮
-			
+	  webviewView.webview.onDidReceiveMessage(async message=>{
+		switch(message.type){//webview申请初始化显示
+		case 'initialize':
+			if(typeof filesystem.workspace_folder === 'string'){//用户打开了工作区
+				if(typeof filesystem.game_floder === 'string'){//存在game文件夹
+					if(filesystem.isStringArray(filesystem.gamecontent_json_path)){//存在游戏内容json文件
+						let chaptername:string[] = await filesystem.getChapterList(filesystem.gamecontent_json_path);
+						webviewView.webview.postMessage({chapterlist:chaptername});
+					}
+				}
+			}
+			else{
+
+			}
+
+			break;
+
+		case 'getcontent':
+			break;
 		}
+
+
 	  });
 
 	}
