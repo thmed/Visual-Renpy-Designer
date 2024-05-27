@@ -17,15 +17,16 @@ import {SidebarProvider} from './webview_communication';
 
 /**********************************************************Extension entry************************************************************/
 
+
+
 export function activate(context: vscode.ExtensionContext) {
 
     filesystem.initialize();
-    if(filesystem.gamecontent_json_exit){
-        console.log('exit');
-    }
 
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider('designer-manager',new SidebarProvider(context)));//创建sidebarwebview
 
+
+    
 }
 
 

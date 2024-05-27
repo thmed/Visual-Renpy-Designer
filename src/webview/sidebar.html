@@ -3,8 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
 </head>
 <body>
-    <p>hello</p>
+    <div id="webcontent" class="waiting">
+        <p id="text"></p>
+    </div>
+    <script>
+    const vscode=acquireVsCodeApi();
+
+    function initialShow(){
+        vscode.postMessage({type:'initialize'});
+    }
+
+    window.addEventListener('message', event => {
+        const message = event.data;
+        if (message && Array.isArray(message.chapterlist)) {
+            message.chapterlist.forEach(element=>{
+                    document.getElementById('text').innerHTML+=element;
+            })
+      }
+
+
+        
+    });
+
+    initialShow();
+    </script>
 </body>
 </html>

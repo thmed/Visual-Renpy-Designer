@@ -12,6 +12,7 @@ export { FileSystem };
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as jsonstream from 'jsonstream';
 
 
 class FileSystem {
@@ -26,16 +27,42 @@ class FileSystem {
 
     /***********************************************Static initialization method******************************************************/
 
-    static initialize() {
+    static initialize() {//初始化获取用户工作区文件相关信息
         this.workspace_folder = this.getWorkspaceFloder();
         this.game_floder = this.detectGameFloder();
         this.gamecontent_json_path = this.detectGameContentJson();
     }
 
-    /*Static member function*/
+    /**************************************************Static member function*********************************************************/
+
     static readUserFilesStructrue(): void {//读取用户文件并存于一定的文件存储结构中,包括renpy script文件，资源文件等
 
     }
+
+    static async getChapterList(json_path: string[]): Promise<string[]> {
+        const chapterNames: string[] = [];
+      
+        return new Promise((resolve, reject) => {
+          const readStream = fs.createReadStream(json_path[0]);
+          const jsonStream = jsonstream.parse('chapter.*.chaptername');
+      
+          readStream.pipe(jsonStream);
+      
+          jsonStream.on('data', (chaptername: string) => {
+            chapterNames.push(chaptername);
+          });
+      
+          jsonStream.on('end', () => {
+            console.log('File reading and parsing completed.');
+            resolve(chapterNames); // 解析完成后返回结果
+          });
+      
+          jsonStream.on('error', (err) => {
+            console.error('Error reading or parsing file:', err);
+            reject(err); // 处理错误
+          });
+        });
+      }
 
     static readGameContentSentence(): void {//读取选定sentence的内容，参数：选定的sentence
 
@@ -115,6 +142,10 @@ class FileSystem {
         return html;
     }
 
+
+    static isStringArray(value: any): value is string[] {//判断一个变量是不是字符串数组
+        return Array.isArray(value) && value.every(item => typeof item === 'string');
+      }
 
     /**************************************************Static member object***********************************************************/
     
