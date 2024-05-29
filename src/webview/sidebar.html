@@ -8,31 +8,96 @@
             margin: 0px;
             padding: 0px;
         }
+        body{
+            background-color: aliceblue;
+            color: black;
+        }
+        .chapterlist-title{
+            background-color: aliceblue;
+            color: black;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 40px,0px,40px,0px;
+            border-style: none none solid none;
+        }
+        .chapterlist-item{
+            background-color:aliceblue;
+            color: black;
+            font-size: 16px;
+            text-align: left;
+            margin-top: 10px;
+            border-style: none none none solid;
+            cursor: pointer;
+        }
+        .chapterlist-item:hover{
+            color: rgb(127, 134, 141);
+        }
     </style>
 </head>
 <body>
-    <div id="webcontent" class="waiting">
-        <p id="text"></p>
-    </div>
-    <script>
-    const vscode=acquireVsCodeApi();
 
+    <div id="webcontent" class="" onclick="clickChapterName(chapter_name)"></div>
+
+    <script>
+    
+    /***********************初始化函数***********************/
     function initialShow(){
-        vscode.postMessage({type:'initialize'});
+        vscode.postMessage({type:'get_initialize'});
     }
 
+    /*********************页面内容html**********************/
+    let chapter_list_content = `
+    <div class="chapterlist-title">章列表</div>
+    `
+
+
+    /**********************触发事件函数***********************/
+    function clickChapterName(element){//点击章名获取对应节列表
+        const chapter_name = element.innerHTML;
+        vscode.postMessage({type:'get_section_list',content:chapter_name});
+    }
+
+
+    /**********************通信函数*************************/
+    const vscode=acquireVsCodeApi();
     window.addEventListener('message', event => {
         const message = event.data;
-        if (message && Array.isArray(message.chapterlist)) {
-            message.chapterlist.forEach(element=>{
-                    document.getElementById('text').innerHTML+=element;
-            })
+        if(message){
+            switch(message.type){
+                case 'give_initialize':
+                    let webcontent = document.getElementById('webcontent');//获取名为webcontent的div，以便修改内容
+                    let stat = message.status;
+                    switch(stat){
+                        case 'yes':
+                            webcontent.innerHTML='';
+                            webcontent.className='chapter-list';
+                            webcontent.innerHTML+=chapter_list_content;
+
+                            message.content.forEach(element => {//将各个章名列入html中
+                                webcontent.innerHTML+='<div class="chapterlist-item" onclick="clickChapterName(this)">'+element+'</div>';
+                            });
+
+                        break;
+
+                        case 'no_workplace':
+                            //document.getElementById('text').innerHTML+="未打开工作区";
+                        break;
+
+                        case 'no_gamefloder':
+                            //document.getElementById('text').innerHTML+="没有找到game文件夹";
+                        break;
+
+                        case 'no_jsonfile':
+                            //document.getElementById('text').innerHTML+="没有找到游戏演出内容json文件(.vrd.json)";
+                        break;
+                    }
+                break;
+            }
       }
-
-
-        
     });
 
+    //启动初始化
     initialShow();
     </script>
 </body>
