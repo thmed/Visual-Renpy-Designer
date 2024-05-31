@@ -15,6 +15,32 @@
                             "text":"我是铃仙"
                         }
                     ]
+                },
+                {
+                    "sectionname":"section2",
+                    "sentence":[
+                        {
+                            "charactername":"铃仙",
+                            "text":"大家好，这个文件是用来展示用于存储游戏内容的json数据结构的，目前只写了一部分，完整结构待补充"
+                        },
+                        {
+                            "charactername":"铃仙",
+                            "text":"我是铃仙"
+                        }
+                    ]
+                },
+                {
+                    "sectionname":"section3",
+                    "sentence":[
+                        {
+                            "charactername":"铃仙",
+                            "text":"大家好，这个文件是用来展示用于存储游戏内容的json数据结构的，目前只写了一部分，完整结构待补充"
+                        },
+                        {
+                            "charactername":"铃仙",
+                            "text":"我是铃仙"
+                        }
+                    ]
                 }
             ]
         },

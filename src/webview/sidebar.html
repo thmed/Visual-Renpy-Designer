@@ -37,13 +37,17 @@
 </head>
 <body>
 
-    <div id="webcontent" class="" onclick="clickChapterName(chapter_name)"></div>
+
+    <div id="webcontent" class=""></div>
 
     <script>
-    
+    /*************************设定值*************************/
+    const if_initialize=0;
+
     /***********************初始化函数***********************/
     function initialShow(){
         vscode.postMessage({type:'get_initialize'});
+        if_initialize=1;
     }
 
     /*********************页面内容html**********************/
@@ -84,7 +88,9 @@
                             //document.getElementById('text').innerHTML+="未打开工作区";
                         break;
 
-                        case 'no_gamefloder':
+
+                        case 'no_gamefolder':
+
                             //document.getElementById('text').innerHTML+="没有找到game文件夹";
                         break;
 
@@ -98,7 +104,9 @@
     });
 
     //启动初始化
-    initialShow();
+    if(!if_initialize)
+        initialShow();
+
     </script>
 </body>
 </html>
