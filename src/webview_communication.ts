@@ -24,14 +24,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		localResourceRoots: [this.context.extensionUri],
 	  };
   
-	  webviewView.webview.html = filesystem.getWebViewContent(this.context,"./src/webview/sidebar.html");
+	  webviewView.webview.html = filesystem.getWebViewContent(this.context,"./src/webview/sidebar.html");//选择显示的html文件
 
-	  webviewView.webview.onDidReceiveMessage(async message=>{
+	  webviewView.webview.onDidReceiveMessage(async message=>{//插件端接受webview端消息并处理
 		switch(message.type){
 		case 'get_initialize'://webview申请初始化显示
 			if(typeof filesystem.workspace_folder === 'string'){//用户打开了工作区
-				if(typeof filesystem.game_floder === 'string'){//存在game文件夹
-					if(filesystem.isStringArray(filesystem.gamecontent_json_path)){//存在游戏内容json文件
+				if(typeof filesystem.game_folder === 'string'){//存在game文件夹
+					if(Array.isArray(filesystem.gamecontent_json_path)){//存在游戏内容json文件
 						//发送json文件中的chapter列表（暂定，待修改）
 						let chaptername:string[] = await filesystem.getChapterList(filesystem.gamecontent_json_path);//获取章列表
 						webviewView.webview.postMessage({type:'give_initialize',status:'yes',content:chaptername});
@@ -39,7 +39,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 						webviewView.webview.postMessage({type:'give_initialize',status:'no_jsonfile',content:''});
 					}
 				} else {//不存在game文件夹
-					webviewView.webview.postMessage({type:'give_initialize',status:'no_gamefloder',content:''});
+					webviewView.webview.postMessage({type:'give_initialize',status:'no_gamefolder',content:''});
 				}
 			} else {//用户没有打开工作区
 				webviewView.webview.postMessage({type:'give_initialize',status:'no_workplace',content:''});

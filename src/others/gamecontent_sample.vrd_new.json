@@ -1,0 +1,74 @@
+{
+    "chapter":[
+        {
+            "chaptername":"chapter1",
+            "next_chapter":["chapter2"]
+        },
+        {
+            "chaptername":"chapter2",
+            "next_chapter":[]
+        }
+    ],
+    "sectionlist":[
+        {
+            "chaptername":"chapter1",
+            "section":[
+                {
+                    "sectionname":"section1",
+                    "next_section":["section2"]
+                },
+                {
+                    "sectionname":"section2",
+                    "next_section":["section3"]
+                },
+                {
+                    "sectionname":"section3",
+                    "next_section":[]
+                }
+            ]
+        },
+        {
+            "chaptername":"chapter2",
+            "section":[
+                
+            ]
+        }
+    ],
+    "sentencelist":[
+        {
+            "chaptername":"chapter1",
+            "sectionname":"section1",
+            "sentence":[
+                {
+                    "character_name":"铃仙",
+                    "text":"这是第一句话"
+                },
+                {
+                    "character_name":"铃仙",
+                    "text":"这是第二句话"
+                }
+            ]
+        },
+        {
+            "chaptername":"chapter1",
+            "sectionname":"section2",
+            "sentence":[
+
+            ]
+        },
+        {
+            "chaptername":"chapter1",
+            "sectionname":"section3",
+            "sentence":[
+
+            ]
+        },
+        {
+            "chaptername":"chapter2",
+            "sectionname":"",
+            "sentence":[
+
+            ]
+        }
+    ]
+}
