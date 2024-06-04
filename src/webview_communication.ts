@@ -14,6 +14,16 @@ import { FileSystem as filesystem } from './filesystem';
 
 
 /***********************************************performance manager sidebar webview***************************************************/
+class MessageVscToExtension{//vsc端向插件端发送的消息的格式
+	type:string;
+	subtype:string;
+	contents?:any;
+	constructor(type:string, subtype:string, contents?:any){
+		this.type=type;
+		this.subtype=subtype;
+		this.contents=contents;
+	}
+}
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	constructor(protected context: vscode.ExtensionContext) {}
@@ -28,39 +38,58 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
 	  webviewView.webview.onDidReceiveMessage(async message=>{//插件端接受webview端消息并处理
 		switch(message.type){
-		case 'get_initialize'://webview申请初始化显示
-			if(typeof filesystem.workspace_folder === 'string'){//用户打开了工作区
-				if(typeof filesystem.game_folder === 'string'){//存在game文件夹
-					if(Array.isArray(filesystem.gamecontent_json_path)){//存在游戏内容json文件
-						//发送json文件中的chapter列表（暂定，待修改）
-						let chaptername:string[] = await filesystem.getChapterList(filesystem.gamecontent_json_path);//获取章列表
-						webviewView.webview.postMessage({type:'give_initialize',status:'yes',content:chaptername});
-					} else {//不存在游戏内容json文件
-						webviewView.webview.postMessage({type:'give_initialize',status:'no_jsonfile',content:''});
+			case 'initialize':
+				if(typeof filesystem.workspace_folder === 'string'){//用户打开了工作区
+					if(typeof filesystem.game_folder === 'string'){//存在game文件夹
+						if(Array.isArray(filesystem.gamecontent_json_path)){//存在游戏内容json文件
+							let jsonlist:string[] = filesystem.getGameContentJsonList();//获取json文件列表
+							webviewView.webview.postMessage(new MessageVscToExtension('initialize','success',jsonlist));
+						} else {//不存在游戏内容json文件
+							webviewView.webview.postMessage(new MessageVscToExtension('initialize','no_jsonfile'));
+						}
+					} else {//不存在game文件夹
+						webviewView.webview.postMessage(new MessageVscToExtension('initialize','no_gamefolder'));
 					}
-				} else {//不存在game文件夹
-					webviewView.webview.postMessage({type:'give_initialize',status:'no_gamefolder',content:''});
+				} else {//用户没有打开工作区
+					webviewView.webview.postMessage(new MessageVscToExtension('initialize','no_workplace'));
 				}
-			} else {//用户没有打开工作区
-				webviewView.webview.postMessage({type:'give_initialize',status:'no_workplace',content:''});
-			}
-			break;
+				break;
 
-		case 'get_json_list'://webview请求json文件列表
-		break;
+			case 'get':
+				switch(message.subtype){
+					case 'json_list':
+						let jsonlist=filesystem.getGameContentJsonList();
+						webviewView.webview.postMessage(new MessageVscToExtension('give','json_list',jsonlist));
+						break;
 
-		case 'get_chapter_list'://webview请求章列表
-		break;
-		
-		case 'get_section_list'://webview请求节列表
-			console.log('请求该章下的节列表：',message.content);//待修改
-		break;
+					case 'chapter_list':
+						let chapterlist=await filesystem.getChapterList(message.contents[0]);
+						webviewView.webview.postMessage(new MessageVscToExtension('give','chapter_list',chapterlist));
+						filesystem.current_selected_json=message.contents[0];
+						break;
 
-		case 'get_sentence_content'://webview请求句子内容
-		break;
+					case 'section_list':
+						break;
+
+					case 'sentence_content':
+						break;
+				}
+				break;
+
+			case 'create':
+				switch(message.subtype){
+					case 'new_json':
+						break;
+				}
+				break;
+
+			case 'delete':
+				break;
+
+			case 'change':
+				break;
 
 		}
-
 
 	  });
 

@@ -6,6 +6,7 @@
 
 
 //使用ctrl+F搜索“暂定”或“修改”来查看哪些地方需要修改
+//注意有些变量的英文后面有字母's'
 
 
 /*********************************************************About modules***************************************************************/
@@ -25,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
     filesystem.initialize();
 
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider('designer-manager',new SidebarProvider(context)));//创建sidebarwebview
-
 
     
 }

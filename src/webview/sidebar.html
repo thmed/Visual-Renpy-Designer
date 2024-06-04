@@ -12,7 +12,7 @@
             background-color: aliceblue;
             color: black;
         }
-        .chapterlist-title{
+        .chapterlist-title,.jsonlist-title{
             background-color: aliceblue;
             color: black;
             font-size: 24px;
@@ -21,7 +21,7 @@
             margin: 40px,0px,40px,0px;
             border-style: none none solid none;
         }
-        .chapterlist-item{
+        .chapterlist-item,.jsonlist-item{
             background-color:aliceblue;
             color: black;
             font-size: 16px;
@@ -33,34 +33,84 @@
         .chapterlist-item:hover{
             color: rgb(127, 134, 141);
         }
+        .jsonlist-item:hover{
+            color: rgb(127, 134, 141);
+        }
     </style>
 </head>
 <body>
 
 
     <div id="webcontent" class=""></div>
+    
 
     <script>
     /*************************设定值*************************/
     const if_initialize=0;
+    class MessageExtensionToVsc{//webview端向插件端发送的消息的格式
+        constructor(type,subtype,...contents){
+            this.type=type;
+            this.subtype=subtype;
+            this.contents=contents;
+        }
+    }
 
     /***********************初始化函数***********************/
     function initialShow(){
-        vscode.postMessage({type:'get_initialize'});
+        vscode.postMessage(new MessageExtensionToVsc('initialize'));
         if_initialize=1;
     }
 
-    /*********************页面内容html**********************/
-    let chapter_list_content = `
+    /**********************页面内容html**********************/
+    const chapter_list_html = `
     <div class="chapterlist-title">章列表</div>
     `
 
+    const json_list_html = `
+    <div class="jsonlist-title">json文件</div>
+    `
+
+
+    /*********************显示页面内容的函数*******************/
+    function showChapterList(chapterlist){
+        let webcontent = document.getElementById('webcontent');
+        webcontent.innerHTML='';//先清空原内容
+        webcontent.className='chapter-list';//设置webcontent类属性
+        webcontent.innerHTML+=chapter_list_html;//加入基本内容
+        chapterlist.forEach(element => {//将各个章名列入html中
+            webcontent.innerHTML+='<div class="chapterlist-item" onclick="clickChapterName(this)">'+element+'</div>';
+        });
+        webcontent.innerHTML+=`
+        <button onclick="getJsonList()">返回json文件列表</button>
+        `
+    }
+
+    function showJsonList(jsonlist){
+        let webcontent = document.getElementById('webcontent');
+        webcontent.innerHTML='';//先清空原内容
+        webcontent.className='json-list';//设置webcontent类属性
+        webcontent.innerHTML+=json_list_html;//加入基本内容
+        jsonlist.forEach(element => {//将各个json文件名列入html中
+            webcontent.innerHTML+='<div class="jsonlist-item" onclick="clickJsonName(this)">'+element+'</div>';
+        });
+    }
+
 
     /**********************触发事件函数***********************/
-    function clickChapterName(element){//点击章名获取对应节列表
-        const chapter_name = element.innerHTML;
-        vscode.postMessage({type:'get_section_list',content:chapter_name});
+    function getJsonList(){
+        vscode.postMessage(new MessageExtensionToVsc('get','json_list'))
     }
+
+    function clickJsonName(element){//点击json文件名获取对应章列表
+        let json_name = element.innerHTML;
+        vscode.postMessage(new MessageExtensionToVsc('get','chapter_list',json_name));
+    }
+
+    function clickChapterName(element){//点击章名获取对应节列表
+        let chapter_name = element.innerHTML;
+        vscode.postMessage(new MessageExtensionToVsc('get','section_list',chapter_name));
+    }
+
 
 
     /**********************通信函数*************************/
@@ -69,17 +119,17 @@
         const message = event.data;
         if(message){
             switch(message.type){
-                case 'give_initialize':
+                case 'initialize':
                     let webcontent = document.getElementById('webcontent');//获取名为webcontent的div，以便修改内容
-                    let stat = message.status;
+                    let stat = message.subtype;
                     switch(stat){
-                        case 'yes':
-                            webcontent.innerHTML='';
-                            webcontent.className='chapter-list';
-                            webcontent.innerHTML+=chapter_list_content;
+                        case 'success':
+                            webcontent.innerHTML='';//先清空原内容
+                            webcontent.className='json-list';//设置webcontent类属性
+                            webcontent.innerHTML+=json_list_html;//加入基本内容
 
-                            message.content.forEach(element => {//将各个章名列入html中
-                                webcontent.innerHTML+='<div class="chapterlist-item" onclick="clickChapterName(this)">'+element+'</div>';
+                            message.contents.forEach(element => {//将各个json文件名列入html中
+                                webcontent.innerHTML+='<div class="jsonlist-item" onclick="clickJsonName(this)">'+element+'</div>';
                             });
 
                         break;
@@ -87,7 +137,6 @@
                         case 'no_workplace':
                             //document.getElementById('text').innerHTML+="未打开工作区";
                         break;
-
 
                         case 'no_gamefolder':
 
@@ -98,7 +147,23 @@
                             //document.getElementById('text').innerHTML+="没有找到游戏演出内容json文件(.vrd.json)";
                         break;
                     }
-                break;
+
+                    break;
+
+                case 'give':
+                    switch(message.subtype){
+                        case 'chapter_list':
+                            showChapterList(message.contents)
+                            break;
+
+                        case 'json_list':
+                            showJsonList(message.contents)
+                            break;
+                    }
+                    break;
+
+                case 'show':
+                    break;
             }
       }
     });
