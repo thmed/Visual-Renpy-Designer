@@ -36,6 +36,39 @@
         .jsonlist-item:hover{
             color: rgb(127, 134, 141);
         }
+        .error-text {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 60%;
+            background-color: rgba(31, 31, 31,0.7);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 40px;
+            animation: slide-up 0.5s ease-in-out;
+        }
+        .error-text p {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            color: red;
+            font-size: 20px;
+            margin: 0;
+        }
+        .error-text span {
+            display: block;
+            text-align: center;
+            font-size: 16px;
+            color: white;
+        }
+        @keyframes slide-up {
+            0% {
+                transform: translateY(100%);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -70,7 +103,6 @@
     <div class="jsonlist-title">json文件</div>
     `
 
-
     /*********************显示页面内容的函数*******************/
     function showChapterList(chapterlist){
         let webcontent = document.getElementById('webcontent');
@@ -93,6 +125,23 @@
         jsonlist.forEach(element => {//将各个json文件名列入html中
             webcontent.innerHTML+='<div class="jsonlist-item" onclick="clickJsonName(this)">'+element+'</div>';
         });
+    }
+
+    function hideErrorText() {//隐藏错误提示框
+        const errorBox = document.querySelector('.error-text');
+        if (errorBox) {
+            errorBox.remove();
+        }
+    }
+
+    function showErrorText(text) {//显示错误提示框
+        const errorBoxHTML = `
+        <div class="error-text">
+            <p>!!!</p>
+            <span id="error">${text}</span>
+        </div>
+        `;
+        document.body.innerHTML += errorBoxHTML;
     }
 
 
@@ -132,19 +181,19 @@
                                 webcontent.innerHTML+='<div class="jsonlist-item" onclick="clickJsonName(this)">'+element+'</div>';
                             });
 
+                            hideErrorText();// 无错误时默认隐藏错误提示框
                         break;
 
                         case 'no_workplace':
-                            //document.getElementById('text').innerHTML+="未打开工作区";
+                            showErrorText("未打开工作区");//弹出错误提示框
                         break;
 
                         case 'no_gamefolder':
-
-                            //document.getElementById('text').innerHTML+="没有找到game文件夹";
+                            showErrorText("没有找到game文件夹");//弹出错误提示框
                         break;
 
                         case 'no_jsonfile':
-                            //document.getElementById('text').innerHTML+="没有找到游戏演出内容json文件(.vrd.json)";
+                            showErrorText("没有找到游戏演出内容json文件(.vrd.json)");//弹出错误提示框
                         break;
                     }
 
